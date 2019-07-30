@@ -1,7 +1,7 @@
 let config = {
     host    : 'localhost',
-    user    : 'root',
-    password: 'root',
+    user    : 'sleep_logger',
+    password: 'SDFgajiogr',
     database: 'sleep_log_server'
 };
 
