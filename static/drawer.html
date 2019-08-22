@@ -107,40 +107,57 @@
 
     function save() {
 
+        var url = new URL(window.location.href);
+        var imageId = url.searchParams.get("image");
 
-            var url = new URL(window.location.href);
-            var imageId = url.searchParams.get("image");
-
-            if (imageId < firstImg){
-                url.searchParams.set("image", parseInt(imageId)+1);
-                window.location.href = url.toString();
-                return;
-            }
+        if (imageId < firstImg) {
+            url.searchParams.set("image", parseInt(imageId) + 1);
+            window.location.href = url.toString();
+            return;
+        }
 
         var dataURL = canvas.toDataURL();
 
+        let selectedRadioButton = undefined
+        if (imageId >= firstImg) {
+            let smileyChooserFieldset = document.getElementById('smileyChooser');
+            let radios = document.getElementsByClassName('radiosmiley')
+            for (let i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    selectedRadioButton = radios[i].value;
+                }
+            }
+
+            if (selectedRadioButton == undefined) {
+                alert('Please select one Smiley!')
+            }
+          }
+
+
+        if (imageId >= maxImageNr || selectedRadioButton) {
             fetch('/log', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({a: 1, imageId: imageId, image: dataURL})
+                body: JSON.stringify({
+                    surveyId: url.searchParams.get("surveyid"),
+                    imageId: imageId,
+                    smiley: selectedRadioButton,
+                    image: dataURL
+                })
             }).then(async rawResponse => {
                 const content = await rawResponse.json();
                 console.log(content);
-                if (content.message && content.message == 'saved'){
-                    url.searchParams.set("image", parseInt(imageId)+1);
+                if (content.message && content.message == 'saved') {
+                    url.searchParams.set("image", parseInt(imageId) + 1);
                     window.location.href = url.toString();
-                }
-                else {
+                } else {
                     alert('Ihre Eingabe konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.')
                 }
 
             });
-
-
-
-
+        }
 
     }
 
@@ -188,8 +205,8 @@
     }
 </script>
 <body onload="init()">
-<h3 id="titel">LMU Study - cool name goes here</h3>
-<p id="beschreibung">Bitte markiere hier irgendwas TODO:</p>
+<h3 id="titel" style="text-align: center">LMU Study - cool name goes here</h3>
+<p id="beschreibung" style="text-align: center;">Bitte markiere hier irgendwas TODO:</p>
 <div id="anleitung" style="display: none;">
     <p>Anleitung TODO</p>
 </div>
@@ -213,7 +230,29 @@
 <!--<div style="position:absolute;top:20%;left:43%;">Eraser</div>-->
 <!--<div style="position:absolute;top:22%;left:45%;width:15px;height:15px;background:white;border:2px solid;" id="white" onclick="color(this)"></div>-->
 <img id="canvasimg" style="position:absolute;top:10%;left:52%;" style="display:none;">
-<input type="button" value="Zurücksetzen" id="clr" size="23" onclick="erase()" style="position:fixed;bottom:10%;left:10%;z-index: 2000">
+<input type="button" value="Bild Zurücksetzen" id="clr" size="23" onclick="erase()" style="z-index: 2000; margin:12pt">
+<div id="smileybox">
+    <p>TODO Hier was auswählen:</p>
+    <fieldset style="border-style: none" id="smileyChooser">
+        <div style="position: relative">
+            <input class="radiosmiley" type="radio" id="happy" name="Zahlmethode" value="happy" style="vertical-align: middle;height:100%;position: absolute">
+            <label for="happy"><img src="smileys/happiest.jpg" style="height:50pt;margin-left: 15pt"> Happy</label>
+        </div>
+        <div style="position: relative">
+            <input class="radiosmiley" type="radio" id="mediumhappy" name="Zahlmethode" value="mediumhappy" style="vertical-align: middle;height:100%;position: absolute">
+            <label for="mediumhappy"><img src="smileys/mediumhappy.jpg" style="height:50pt;margin-left: 15pt"> Medium Happy</label>
+        </div>
+        <div style="position: relative">
+            <input class="radiosmiley" type="radio" id="mediumsad" name="Zahlmethode" value="mediumsad" style="vertical-align: middle;height:100%;position: absolute">
+            <label for="mediumsad"><img src="smileys/mediumSad.jpg" style="height:50pt;margin-left: 15pt"> Medium Sad</label>
+        </div>
+        <div style="position: relative">
+            <input class="radiosmiley" type="radio" id="sadest" name="Zahlmethode" value="sadest" style="vertical-align: middle;height:100%;position: absolute">
+            <label for="sadest"><img src="smileys/sadest.jpg" style="height:50pt;margin-left: 15pt"> Sadest</label>
+        </div>
+    </fieldset>
+</div>
+
 <input type="button" value="Weiter" id="btn" size="60" onclick="save()" style="position:fixed;bottom:10%;right:10%;z-index:2000;font-size:30pt">
 
 <div style="display:none;">
