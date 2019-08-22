@@ -1,5 +1,11 @@
 <html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+    }
+</style>
 <script type="text/javascript">
     var canvas, ctx, flag = false,
         prevX = 0,
@@ -8,53 +14,68 @@
         currY = 0,
         dot_flag = false;
 
+    const firstImg = 1; // index of first image
+    const maxImageNr = 3; // index of last image
 
     function init() {
         document.body.addEventListener("touchstart", function(e){ if (e.target.nodeName == 'CANVAS') { e.preventDefault(); } }, false);
         document.body.addEventListener("touchend", function(e){ if (e.target.nodeName == 'CANVAS') { e.preventDefault(); } }, false);
         document.body.addEventListener("touchmove", function(e){ if (e.target.nodeName == 'CANVAS') { e.preventDefault(); } }, false);
 
-
         const image = document.getElementById('source');
         var url = new URL(window.location.href);
-        var c = url.searchParams.get("image");
-        image.src = 'pictures/'+c+'.jpg'
+        var imageId = url.searchParams.get("image");
 
-        image.onload = () => {
-            canvas = document.getElementById('can');
-            ctx = canvas.getContext("2d");
-            w = canvas.width;
-            h = canvas.height;
-            ctx.clearRect(0, 0, w, h);
-            canvascontainer = document.getElementById('canvascontainer')
-
-            canvas.addEventListener("mousemove", function (e) {
-                findxy('move', e, false)
-            }, false);
-            canvas.addEventListener("touchmove", function (e) {
-                findxy('move', e, true)
-            }, false);
-            canvas.addEventListener("mousedown", function (e) {
-                findxy('down', e, false)
-            }, false);
-            canvas.addEventListener("touchstart", function (e) {
-                findxy('down', e, true)
-            }, false);
-            canvas.addEventListener("mouseup", function (e) {
-                findxy('up', e, false)
-            }, false);
-            canvas.addEventListener("touchend", function (e) {
-                findxy('up', e, true)
-            }, false);
-            canvas.addEventListener("mouseout", function (e) {
-                findxy('out', e, false)
-            }, false);
-
-            const image2 = document.getElementById('source');
-            ctx.drawImage(image2,0,0,w,h);
+        if (imageId < firstImg){
+            // TODO Einführungsseite
+            document.getElementById('anleitung').style.display ='block';
+            document.getElementById('beschreibung').style.display ='none';
         }
+        else if (imageId > maxImageNr){
+            // TODO Endseite
+            document.getElementById('endseite').style.display = 'block';
+            document.getElementById('beschreibung').style.display ='none';
+        }
+        else {
+            // normale Seite
 
+            image.src = 'pictureslive/' + imageId + '.jpg'
 
+            image.onload = () => {
+                canvas = document.getElementById('can');
+                ctx = canvas.getContext("2d");
+                w = canvas.width;
+                h = canvas.height;
+                ctx.clearRect(0, 0, w, h);
+                canvascontainer = document.getElementById('canvascontainer')
+
+                canvas.addEventListener("mousemove", function (e) {
+                    findxy('move', e, false)
+                }, false);
+                canvas.addEventListener("touchmove", function (e) {
+                    findxy('move', e, true)
+                }, false);
+                canvas.addEventListener("mousedown", function (e) {
+                    findxy('down', e, false)
+                }, false);
+                canvas.addEventListener("touchstart", function (e) {
+                    findxy('down', e, true)
+                }, false);
+                canvas.addEventListener("mouseup", function (e) {
+                    findxy('up', e, false)
+                }, false);
+                canvas.addEventListener("touchend", function (e) {
+                    findxy('up', e, true)
+                }, false);
+                canvas.addEventListener("mouseout", function (e) {
+                    findxy('out', e, false)
+                }, false);
+
+                const image2 = document.getElementById('source');
+                ctx.drawImage(image2, 0, 0, w, h);
+            }
+
+        }
     }
 
     function correctX(x){
@@ -71,8 +92,8 @@
         ctx.beginPath();
         ctx.moveTo(correctX(prevX), correctX(prevY));
         ctx.lineTo(correctY(currX), correctY(currY));
-        ctx.strokeStyle = 'red';
-        ctx.lineWidth = "10";
+        ctx.strokeStyle = 'rgba(255,0,0,0.38)';
+        ctx.lineWidth = "30";
         ctx.stroke();
         ctx.closePath();
     }
@@ -85,20 +106,42 @@
     }
 
     function save() {
+
+
+            var url = new URL(window.location.href);
+            var imageId = url.searchParams.get("image");
+
+            if (imageId < firstImg){
+                url.searchParams.set("image", parseInt(imageId)+1);
+                window.location.href = url.toString();
+                return;
+            }
+
         var dataURL = canvas.toDataURL();
 
-        (async () => {
-            const rawResponse = await fetch('/log', {
+            fetch('/log', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({a: 1, b: 'Textual content', image: dataURL})
-            });
-            const content = await rawResponse.json();
+                body: JSON.stringify({a: 1, imageId: imageId, image: dataURL})
+            }).then(async rawResponse => {
+                const content = await rawResponse.json();
+                console.log(content);
+                if (content.message && content.message == 'saved'){
+                    url.searchParams.set("image", parseInt(imageId)+1);
+                    window.location.href = url.toString();
+                }
+                else {
+                    alert('Ihre Eingabe konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.')
+                }
 
-            console.log(content);
-        })();
+            });
+
+
+
+
+
     }
 
     function findxy(res, e, isTouch) {
@@ -145,7 +188,15 @@
     }
 </script>
 <body onload="init()">
-<div id="canvascontainer" style="max-width: 90%;overflow: hidden;position: relative">
+<h3 id="titel">LMU Study - cool name goes here</h3>
+<p id="beschreibung">Bitte markiere hier irgendwas TODO:</p>
+<div id="anleitung" style="display: none;">
+    <p>Anleitung TODO</p>
+</div>
+<div id="endseite" style="display: none">
+    <p>Endseite TODO</p>
+</div>
+<div id="canvascontainer" style="max-width: 90%;overflow: hidden;position: relative;max-height:80vh">
     <canvas id="can" width="2000" height="1333" style="position:absolute;max-height:100%;max-width:100%;z-index: 1000;touch-action: none"></canvas>
     <img id="source"
          src="pictures/WhatsApp%20Image%202019-07-06%20at%2018.13.34.jpeg"
@@ -162,8 +213,8 @@
 <!--<div style="position:absolute;top:20%;left:43%;">Eraser</div>-->
 <!--<div style="position:absolute;top:22%;left:45%;width:15px;height:15px;background:white;border:2px solid;" id="white" onclick="color(this)"></div>-->
 <img id="canvasimg" style="position:absolute;top:10%;left:52%;" style="display:none;">
-<input type="button" value="save" id="btn" size="30" onclick="save()" style="position:fixed;bottom:10%;left:10%;z-index:2000">
-<input type="button" value="clear" id="clr" size="23" onclick="erase()" style="position:fixed;bottom:10%;left:15%;z-index: 2000">
+<input type="button" value="Zurücksetzen" id="clr" size="23" onclick="erase()" style="position:fixed;bottom:10%;left:10%;z-index: 2000">
+<input type="button" value="Weiter" id="btn" size="60" onclick="save()" style="position:fixed;bottom:10%;right:10%;z-index:2000;font-size:30pt">
 
 <div style="display:none;">
 
