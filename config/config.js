@@ -1,8 +1,8 @@
 let config = {
     host    : 'localhost',
-    user    : 'sleep_logger',
+    user    : 'pictorial',
     password: 'SDFgajiogr',
-    database: 'sleep_log_server'
+    database: 'pictorial_server'
 };
 
 module.exports = config;

@@ -15,7 +15,7 @@
         dot_flag = false;
 
     const firstImg = 1; // index of first image
-    const maxImageNr = 3; // index of last image
+    const maxImageNr = 18; // index of last image
 
     function init() {
         document.body.addEventListener("touchstart", function(e){ if (e.target.nodeName == 'CANVAS') { e.preventDefault(); } }, false);
@@ -30,11 +30,13 @@
             // TODO Einführungsseite
             document.getElementById('anleitung').style.display ='block';
             document.getElementById('beschreibung').style.display ='none';
+            document.getElementById('smileybox').style.display = 'none';
         }
         else if (imageId > maxImageNr){
             // TODO Endseite
             document.getElementById('endseite').style.display = 'block';
             document.getElementById('beschreibung').style.display ='none';
+            document.getElementById('smileybox').style.display = 'none';
         }
         else {
             // normale Seite
@@ -172,6 +174,10 @@
             clientX = e.clientX
             clientY = e.clientY
         }
+
+        clientY = clientY - document.getElementById('can').getBoundingClientRect().top;
+        clientX = clientX - document.getElementById('can').getBoundingClientRect().left;
+
         if (res == 'down') {
             prevX = currX;
             prevY = currY;
@@ -205,13 +211,23 @@
     }
 </script>
 <body onload="init()">
-<h3 id="titel" style="text-align: center">LMU Study - cool name goes here</h3>
-<p id="beschreibung" style="text-align: center;">Bitte markiere hier irgendwas TODO:</p>
+<h3 id="titel" style="text-align: center">Discover Traces Of Use</h3>
+<p id="beschreibung" style="text-align: center;">Look at the picture. Paint the traces of use that you see.</p>
 <div id="anleitung" style="display: none;">
-    <p>Anleitung TODO</p>
+    <p>In the following, you will be presented with 18 pictures in total. For each, you will be asked to paint the traces of use that you see and rate,
+        if the trace has a positive or a negative connotation for you. <br>Here an example:<br>
+        <img src="pictureslive/example_playground_2.JPG" alt="Example Scene" width=256 height=384>
+        <img src="pictureslive/example_playground_edited_2.jpg" alt="Example Scene" width=256 height=384><br>
+        Step 1: Look at the picture.<br>
+        Step 2: Paint the traces of use that you see. <br>
+        Step 3: Rate your connotation with the trace by selecting the correct smiley.<br>
+        "The traces of use in the picture have a positive connotation for me."<br>
+        <img src="pictureslive/scale.jpg" alt="Smiley Scale" width=256 height=64><br>
+    </p>
 </div>
 <div id="endseite" style="display: none">
-    <p>Endseite TODO</p>
+    <p>Thank you for participating! If you want to participate in the raffle, please continue here:
+        <br/><a href="https://survey.medien.ifi.lmu.de/index.php/423812/lang-en">https://survey.medien.ifi.lmu.de/index.php/423812/lang-en</a></p>
 </div>
 <div id="canvascontainer" style="max-width: 90%;overflow: hidden;position: relative;max-height:80vh">
     <canvas id="can" width="2000" height="1333" style="position:absolute;max-height:100%;max-width:100%;z-index: 1000;touch-action: none"></canvas>
@@ -232,7 +248,8 @@
 <img id="canvasimg" style="position:absolute;top:10%;left:52%;" style="display:none;">
 <input type="button" value="Bild Zurücksetzen" id="clr" size="23" onclick="erase()" style="z-index: 2000; margin:12pt">
 <div id="smileybox">
-    <p>TODO Hier was auswählen:</p>
+    <p>Rate your connotation with the trace by selecting the correct smiley.<br>
+        "The traces of use in the picture have a positive connotation for me."</p>
     <fieldset style="border-style: none" id="smileyChooser">
         <div style="position: relative">
             <input class="radiosmiley" type="radio" id="happy" name="Zahlmethode" value="happy" style="vertical-align: middle;height:100%;position: absolute">
