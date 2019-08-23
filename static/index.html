@@ -40,6 +40,7 @@
         }
         else {
             // normale Seite
+            document.getElementById('status').innerHTML = imageId + ' of '+maxImageNr;
 
             image.src = 'pictureslive/' + imageId + '.jpg'
 
@@ -212,6 +213,7 @@
 </script>
 <body onload="init()">
 <h3 id="titel" style="text-align: center">Discover Traces Of Use</h3>
+<p id="status" style="margin-left:2%;font-weight: bold"></p>
 <p id="beschreibung" style="text-align: center;">Look at the picture. Paint the traces of use that you see.</p>
 <div id="anleitung" style="display: none;">
     <p>In the following, you will be presented with 18 pictures in total. For each, you will be asked to paint the traces of use that you see and rate,
